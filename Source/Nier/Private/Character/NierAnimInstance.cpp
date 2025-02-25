@@ -22,6 +22,8 @@ void UNierAnimInstance::NativeUpdateAnimation(float DeltaTime)
 
 	Speed = NierCharacter->GetVelocity().Size2D();
 
+	MoveAxis = NierCharacter->GetMoveAxis();
+
 	bIsInAir = NierCharacter->GetCharacterMovement()->IsFalling();
 
 	bIsAccelerating = NierCharacter->GetCharacterMovement()->GetCurrentAcceleration().Size() > 0.0f;

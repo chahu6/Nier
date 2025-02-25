@@ -22,7 +22,7 @@ public:
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
-	ANierCharacter* NierCharacter;
+	TObjectPtr<ANierCharacter> NierCharacter;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
 	float Speed;
@@ -35,4 +35,7 @@ private:
 
 	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
 	bool bIsCrouched;
+
+	UPROPERTY(BlueprintReadOnly, Category = "Character", meta = (AllowPrivateAccess = "true"))
+	FVector2D MoveAxis;
 };

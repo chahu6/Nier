@@ -7,8 +7,6 @@
 
 void UNierAnimInstance::NativeInitializeAnimation()
 {
-	Super::NativeInitializeAnimation();
-
 	NierCharacter = Cast<ANierCharacter>(TryGetPawnOwner());
 }
 

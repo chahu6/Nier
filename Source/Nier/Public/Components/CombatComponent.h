@@ -23,6 +23,8 @@ protected:
 public:
 	void EquipWeapon();
 
+	void ResetCombat();
+
 	UFUNCTION(BlueprintCallable)
 	void KatanaAttack();
 		

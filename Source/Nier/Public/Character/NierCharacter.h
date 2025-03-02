@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Character/NierCharacterBase.h"
+#include "Interfaces/PlayerInterface.h"
 #include "NierCharacter.generated.h"
 
 class USpringArmComponent;
@@ -12,9 +13,11 @@ class UInputAction;
 struct FInputActionValue;
 class UInputMappingContext;
 
+class UCombatComponent;
+
 
 UCLASS()
-class NIER_API ANierCharacter : public ANierCharacterBase
+class NIER_API ANierCharacter : public ANierCharacterBase, public IPlayerInterface
 {
 	GENERATED_BODY()
 
@@ -39,19 +42,28 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	void Move(const FInputActionValue& Value);
+	void Look(const FInputActionValue& Value);
+	void OnJump(const FInputActionValue& Value);
+
 public:	
 	virtual void Tick(float DeltaTime) override;
 
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
-private:
-	void Move(const FInputActionValue& Value);
-	void Look(const FInputActionValue& Value);
-	void OnJump(const FInputActionValue& Value);
+	/** Player Interface */
+	virtual void ResetCombat_Implementation() override;
+	/** Player Interface end */
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Input")
 	FVector2D MoveAxis;
+
+	/** 
+	* 目前Test的属性
+	*/
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	bool bIsAttacking;
 
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
@@ -59,6 +71,9 @@ private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UCombatComponent> CombatComp;
 
 public:
 	FORCEINLINE FVector2D GetMoveAxis() const { return MoveAxis; }

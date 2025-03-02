@@ -4,10 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "Interfaces/WeaponInterface.h"
 #include "BaseWeapon.generated.h"
 
 UCLASS(Abstract)
-class NIER_API ABaseWeapon : public AActor
+class NIER_API ABaseWeapon : public AActor, public IWeaponInterface
 {
 	GENERATED_BODY()
 	

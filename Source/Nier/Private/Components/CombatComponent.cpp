@@ -33,6 +33,11 @@ void UCombatComponent::EquipWeapon()
 	}
 }
 
+void UCombatComponent::ResetCombat()
+{
+	AttackMoveIndex = 0;
+}
+
 void UCombatComponent::KatanaAttack()
 {
 	if (!IsValid(CharacterRef)) return;

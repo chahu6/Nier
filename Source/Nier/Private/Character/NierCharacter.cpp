@@ -7,6 +7,7 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
+#include "Components/CombatComponent.h"
 
 ANierCharacter::ANierCharacter()
 {
@@ -29,6 +30,8 @@ ANierCharacter::ANierCharacter()
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true; // 使得根运动也能使用转向
+
+	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 }
 
 void ANierCharacter::BeginPlay()
@@ -63,6 +66,12 @@ void ANierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCompo
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ANierCharacter::OnJump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ANierCharacter::OnJump);
 	}
+}
+
+void ANierCharacter::ResetCombat_Implementation()
+{
+	bIsAttacking = false;
+	CombatComp->ResetCombat();
 }
 
 void ANierCharacter::Move(const FInputActionValue& Value)

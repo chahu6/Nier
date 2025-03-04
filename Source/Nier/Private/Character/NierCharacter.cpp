@@ -8,10 +8,11 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "Components/CombatComponent.h"
+#include "Components/StateComponent.h"
 
 ANierCharacter::ANierCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	bUseControllerRotationRoll = false;
 	bUseControllerRotationYaw = false; // 主要是这个，其他两个默认false
@@ -29,7 +30,7 @@ ANierCharacter::ANierCharacter()
 	FollowCamera->bUsePawnControlRotation = false;
 
 	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true; // 使得根运动也能使用转向
+	GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true; // 使得根运动也能使用转向，但是不用
 
 	CombatComp = CreateDefaultSubobject<UCombatComponent>(TEXT("CombatComponent"));
 }
@@ -46,12 +47,8 @@ void ANierCharacter::BeginPlay()
 			Subsystem->AddMappingContext(CombatMappingContext, 0);
 		}
 	}
-}
 
-void ANierCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	StateComponent = GetComponentByClass<UStateComponent>();
 }
 
 void ANierCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
@@ -72,6 +69,17 @@ void ANierCharacter::ResetCombat_Implementation()
 {
 	bIsAttacking = false;
 	CombatComp->ResetCombat();
+	StateComponent->ResetState();
+}
+
+void ANierCharacter::ContinueCombat_Implementation()
+{
+	StateComponent->ResetState();
+}
+
+void ANierCharacter::DisableCombat_Implementation()
+{
+	bIsCombatEnabled = false;
 }
 
 void ANierCharacter::Move(const FInputActionValue& Value)

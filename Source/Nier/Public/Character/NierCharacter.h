@@ -14,6 +14,7 @@ struct FInputActionValue;
 class UInputMappingContext;
 
 class UCombatComponent;
+class UStateComponent;
 
 
 UCLASS()
@@ -47,12 +48,12 @@ protected:
 	void OnJump(const FInputActionValue& Value);
 
 public:	
-	virtual void Tick(float DeltaTime) override;
-
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 	/** Player Interface */
 	virtual void ResetCombat_Implementation() override;
+	virtual void ContinueCombat_Implementation() override;
+	virtual void DisableCombat_Implementation() override;
 	/** Player Interface end */
 
 protected:
@@ -65,6 +66,9 @@ protected:
 	UPROPERTY(BlueprintReadWrite, Category = "Combat")
 	bool bIsAttacking;
 
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	bool bIsCombatEnabled;
+
 private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USpringArmComponent> CameraBoom;
@@ -72,8 +76,11 @@ private:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCameraComponent> FollowCamera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UCombatComponent> CombatComp;
+
+	UPROPERTY()
+	TObjectPtr<UStateComponent> StateComponent;
 
 public:
 	FORCEINLINE FVector2D GetMoveAxis() const { return MoveAxis; }

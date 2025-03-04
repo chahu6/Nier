@@ -24,4 +24,10 @@ class NIER_API IPlayerInterface
 public:
 	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat State")
 	void ResetCombat();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat State")
+	void ContinueCombat();
+
+	UFUNCTION(BlueprintCallable, BlueprintNativeEvent, Category = "Combat State")
+	void DisableCombat();
 };

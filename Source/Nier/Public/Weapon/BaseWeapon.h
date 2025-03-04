@@ -23,6 +23,8 @@ public:
 
 	void PlayAttackMontage(int32 InAttackMoveIndex);
 
+	void StopAttackMontage();
+
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly)
 	TObjectPtr<USkeletalMeshComponent> MeshComp;

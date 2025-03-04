@@ -4,6 +4,7 @@
 #include "Components/CombatComponent.h"
 #include "GameFramework/Character.h"
 #include "Weapon/BaseWeapon.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 UCombatComponent::UCombatComponent()
 {
@@ -36,22 +37,93 @@ void UCombatComponent::EquipWeapon()
 void UCombatComponent::ResetCombat()
 {
 	AttackMoveIndex = 0;
+	bIsAttacking = false;
+	bSaveAttacking = false;
+	bCanQuit = true;
+	CharacterRef->GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = true;
+}
+
+void UCombatComponent::ContinueAttack()
+{
+	if (bSaveAttacking)
+	{
+		bSaveAttacking = false;
+		PerformAttack();
+	}
 }
 
 void UCombatComponent::KatanaAttack()
 {
-	if (!IsValid(CharacterRef)) return;
+	if (!bIsAttacking)
+	{
+		bIsAttacking = true;
+		CharacterRef->GetCharacterMovement()->bAllowPhysicsRotationDuringAnimRootMotion = false;
+		WeaponRef->AttachToComponent(CharacterRef->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, RootSocketName);
 
+		PerformAttack();
+	}
+	else
+	{
+		bSaveAttacking = true;
+	}
+}
+
+void UCombatComponent::PerformAttack()
+{
+	if (!IsValid(CharacterRef) || !IsValid(CharacterRef->GetMesh())) return;
 	if (AttackMoveIndex < 0) AttackMoveIndex = 0;
 
 	const int32 MontageNum = KatanaMontages.Num();
 	AttackMoveIndex = AttackMoveIndex % MontageNum;
 
-	CharacterRef->StopAnimMontage();
-	CharacterRef->PlayAnimMontage(KatanaMontages[AttackMoveIndex]);
+	if (UAnimInstance* AnimInstance = CharacterRef->GetMesh()->GetAnimInstance())
+	{
+		UAnimMontage* MontagePlay = KatanaMontages[AttackMoveIndex];
 
-	WeaponRef->AttachToComponent(CharacterRef->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, RootSocketName);
+		BlendingOutDelegate.BindUObject(this, &UCombatComponent::OnMontageBlendingOut);
+		AnimInstance->Montage_SetBlendingOutDelegate(BlendingOutDelegate, MontagePlay);
+
+		MontageEndedDelegate.BindUObject(this, &UCombatComponent::OnMontageEnded);
+		AnimInstance->Montage_SetEndDelegate(MontageEndedDelegate, MontagePlay);
+
+		CharacterRef->StopAnimMontage();
+		CharacterRef->PlayAnimMontage(MontagePlay);
+	}
 	WeaponRef->PlayAttackMontage(AttackMoveIndex);
 
 	++AttackMoveIndex;
+}
+
+void UCombatComponent::OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (bInterrupted)
+	{
+		//if (!bIsAttacking) Montage_Interrupted();
+		bInterruptedCalledBeforeBlendingOut = true;
+	}
+}
+
+void UCombatComponent::OnMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (bInterrupted && !bInterruptedCalledBeforeBlendingOut)
+	{
+		//if (!bIsAttacking) Montage_Interrupted();
+	}
+	else
+	{
+		//WeaponRef->AttachToComponent(CharacterRef->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HandSocketName);
+	}
+}
+
+void UCombatComponent::Montage_Interrupted()
+{
+	ResetCombat();
+	StopAttackMontage();
+}
+
+void UCombatComponent::StopAttackMontage()
+{
+	CharacterRef->StopAnimMontage();
+	WeaponRef->StopAttackMontage();
+	WeaponRef->AttachToComponent(CharacterRef->GetMesh(), FAttachmentTransformRules::SnapToTargetIncludingScale, HandSocketName);
 }

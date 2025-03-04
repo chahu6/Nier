@@ -23,10 +23,27 @@ protected:
 public:
 	void EquipWeapon();
 
+	void ContinueAttack(); // AttackCombo
+
+	UFUNCTION(BlueprintCallable)
 	void ResetCombat();
 
 	UFUNCTION(BlueprintCallable)
 	void KatanaAttack();
+
+	UFUNCTION(BlueprintCallable)
+	void StopAttackMontage();
+
+private:
+	void PerformAttack();
+
+	UFUNCTION()
+	void OnMontageBlendingOut(UAnimMontage* Montage, bool bInterrupted);
+
+	UFUNCTION()
+	void OnMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	void Montage_Interrupted();
 		
 protected:
 	UPROPERTY(BlueprintReadOnly)
@@ -44,6 +61,9 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly)
 	FName RootSocketName;
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly)
+	FName HandSocketName;
+
 	/**
 	* Montage Setting
 	*/
@@ -53,4 +73,24 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montage")
 	TArray<UAnimMontage*> KatanaMontages;
+
+	/**
+	* Combat
+	*/
+
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	bool bIsAttacking;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	bool bSaveAttacking;
+
+	UPROPERTY(BlueprintReadWrite, Category = "Combat")
+	bool bCanQuit;
+
+	FOnMontageBlendingOutStarted BlendingOutDelegate;
+	FOnMontageEnded MontageEndedDelegate;
+
+	bool bInterruptedCalledBeforeBlendingOut;
+
+
 };

@@ -69,12 +69,11 @@ void ANierCharacter::ResetCombat_Implementation()
 {
 	bIsAttacking = false;
 	CombatComp->ResetCombat();
-	StateComponent->ResetState();
 }
 
 void ANierCharacter::ContinueCombat_Implementation()
 {
-	StateComponent->ResetState();
+	CombatComp->ContinueAttack();
 }
 
 void ANierCharacter::DisableCombat_Implementation()

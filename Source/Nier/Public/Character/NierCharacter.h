@@ -16,7 +16,6 @@ class UInputMappingContext;
 class UCombatComponent;
 class UStateComponent;
 
-
 UCLASS()
 class NIER_API ANierCharacter : public ANierCharacterBase, public IPlayerInterface
 {
